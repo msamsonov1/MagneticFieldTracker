@@ -1,0 +1,43 @@
+import RPi.GPIO as GPIO
+import serial
+import time
+import csv
+
+# Define the GPIO pins for the Hall effect sensor and the GPS module
+HALL_EFFECT_SENSOR_PIN = 17
+GPS_MODULE_UART = "/dev/ttyAMA0"
+
+# Set up the GPIO pin for the Hall effect sensor
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(HALL_EFFECT_SENSOR_PIN, GPIO.IN)
+
+# Set up the serial port for the GPS module
+gps = serial.Serial(GPS_MODULE_UART, 9600)
+
+# Create a CSV file to store the data
+with open("magnetic_field_data.csv", "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(["timestamp", "gps_latitude", "gps_longitude", "magnetic_field_strength"])
+
+# Start a loop to read the data from the Hall effect sensor and the GPS module
+while True:
+
+    # Read the magnetic field strength from the Hall effect sensor
+    magnetic_field_strength = GPIO.input(HALL_EFFECT_SENSOR_PIN)
+
+    # Read the GPS data from the GPS module
+    gps_data = gps.readline().decode()
+
+    # Split the GPS data into latitude and longitude
+    gps_latitude, gps_longitude = gps_data.split(",")
+
+    # Get the current timestamp
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+
+    # Write the data to the CSV file
+    with open("magnetic_field_data.csv", "a", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow([timestamp, gps_latitude, gps_longitude, magnetic_field_strength])
+
+    # Wait for 1 second before reading the data again
+    time.sleep(1)
