@@ -1,0 +1,20 @@
+import numpy as np
+import scipy.fftpack as fft
+
+# Convert the magnetic waves to an electrical signal.
+signal = np.loadtxt("magnetic_waves.csv", delimiter=",")
+
+# Apply a fast Fourier transform (FFT) to the signal.
+fft_signal = fft.fft(signal)
+
+# Identify the frequency peaks of the magnetic waves.
+frequency_peaks = fft.fftfreq(len(signal))
+
+# Calculate the amplitude of each frequency peak.
+amplitude_peaks = np.abs(fft_signal)
+
+# Convert the amplitude of each frequency peak to Tesla.
+tesla_peaks = amplitude_peaks / 1e-9
+
+# Print the readable terms measured in Tesla.
+print(tesla_peaks)
